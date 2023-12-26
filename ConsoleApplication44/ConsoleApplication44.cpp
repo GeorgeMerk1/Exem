@@ -10,14 +10,14 @@ class Question
 {
 private:
 	string question;
-	string answer;
+	int answer;
 public:
 
 	bool AddQuestion()
 	{
 
 		string useranswer;
-		cout << question<<endl;
+		cout << question << endl;
 		cout << "Введите ответ: ";
 		cin >> useranswer;
 		for (int i = 0; i < useranswer.size(); i++)
@@ -25,76 +25,74 @@ public:
 			if (!isdigit(useranswer[i]))
 			{
 
-				if (i == 0 and useranswer[i] == '-') 
+				if (i == 0 and useranswer[i] == '-')
 				{
 					continue;
 				}
 				return false;
 			}
+
 		}
-		for (int i = 0; i < 4; i++)
+		if (to_string(answer) == useranswer)
 		{
-			if (useranswer != answer)
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-
-
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
-			void SetQuestion(string str)
-			{
-				question = str;
-			}
-
-			void SetAnswer(int answer)
-			{
-				this->answer = answer;
-			}
-};
-	class Test : public Question
+	void SetQuestion(string str)
 	{
-	private:
-		Question test[4];
-		int results = 0;
-	public:
-		void SetTest()
-		{
-			
-			fstream file("P:\\Студенты\\П22\\C++\\ООП\\Вопросы.txt");
-			string str;
-				for (int i = 0; i < 4; i++)
-				{
-					getline(file, str);
-					test[i].SetQuestion(str);
-				}
-				file.close();
+		question = str;
+	}
 
-				fstream file2("P:\\Студенты\\П22\\C++\\ООП\\Ответы.txt");
-				string str2;
-				for (int i = 0; i < 4; i++)
-				{
-					getline(file2, str2);
-					test[i].SetAnswer(atoi(str2.c_str()));
-				}
-				file2.close();
-		}
+	void SetAnswer(int answer)
+	{
+		this->answer = answer;
+	}
+};
+class Test : public Question
+{
+private:
+	Question test[4];
+	int results = 0;
+public:
+	void SetTest()
+	{
 
-		double Pass()
+		fstream file("P:\\Студенты\\П22\\C++\\ООП\\Вопросы.txt");
+		string str;
+		for (int i = 0; i < 4; i++)
 		{
-			for (int i = 0; i < 4; i++)
-			{
-				results += test[i].AddQuestion();
-			}
-			return results / 4 * 100;
+			getline(file, str);
+			test[i].SetQuestion(str);
 		}
-	};
-	
-class User:Test
+		file.close();
+
+		fstream file2("P:\\Студенты\\П22\\C++\\ООП\\Ответы.txt");
+		string str2;
+		for (int i = 0; i < 4; i++)
+		{
+			getline(file2, str2);
+			test[i].SetAnswer(atoi(str2.c_str()));
+		}
+		file2.close();
+	}
+
+	double Pass()
+	{
+		ofstream file("P:\\Студенты\\П22\\C++\\ООП\\Answers.txt");
+		for (int i = 0; i < 4; i++)
+		{
+			results += test[i].AddQuestion();
+		}
+		file << results / 4 * 100;
+		file.close();
+		return results / 4 * 100;
+	}
+};
+
+class User :Test
 {
 	string login;
 	string password;
@@ -108,12 +106,13 @@ public:
 	}
 
 
-	void AddUser()
+
+	void registration()
 	{
-		cout << "Добро пожаловать" << endl;
 
 		string arr[1488];
-		fstream file("P:\\Студенты\\П22\\C++\\ООП\\Users.txt");
+		fstream file;
+		file.open("P:\\Студенты\\П22\\C++\\ООП\\Users.txt");
 		int counterLines = 0;
 		for (int i = 0; getline(file, arr[i]); i++)
 		{
@@ -121,73 +120,117 @@ public:
 		}
 		file.close();
 
-		bool Y = true;
-		
-		do {
+		cout << "Введите логин: ";
+		cin >> login;
+		for (int i = 0; i < counterLines; i += 2)
+		{
+			if (login != arr[i])
+			{
+				cout << "Введите пароль: ";
+				cin >> password;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+			
+		void  Enter()
+		{
+
+			string arr[1488];
+			fstream file;
+			file.open("P:\\Студенты\\П22\\C++\\ООП\\Users.txt");
+			int counterLines = 0;
+			for (int i = 0; getline(file, arr[i]); i++)
+			{
+				counterLines++;
+			}
+			file.close();
+
 			cout << "Введите логин: ";
 			cin >> login;
-			for (int i = 0; i < counterLines; i += 2)
+			for (int i = 1; i < counterLines; i += 2)
 			{
 				if (login == arr[i])
 				{
-					Y = false;
+					while (arr[i] != password)
+					{
+						cout << "Пароль нерпавильный, попробуйте еще раз:";
+						cin >> password;
+						cout << endl;
+
+					}
+				}
+				else
+				{
 					break;
 				}
-				Y = true;
 			}
-			if (!Y)
-			{
-				cout << "Имя пользователя занято, попробуте еще раз:";
-			}
-		} while (!Y);
-
-		cout << "Введите пароль: ";
-		cin >> password;
-		SaveUser();
-
-
-	}
-
-
-
-	void SaveUser()
-	{
-		
-	
-		ofstream file;
-			file.open("P:\\Студенты\\П22\\C++\\ООП\\Users.txt");
-			for (int i = 0; i < login.size(); i++)
-			{
-				file << login<<endl;
-			}
-		for (int i = 0; i < password.size(); i++)
-		{
-			file << password << endl;
 		}
-	}
-
-	void PassTest()
-	{
-		scors[scorsAmount] = Pass();
-		scorsAmount++;
 		
-	}
+		void SaveUser()
+		{
 
-	void ShowResults()
-	{
-		cout << scors;
-	}
-	
+
+			ofstream file;
+			file.open("P:\\Студенты\\П22\\C++\\ООП\\Users.txt");
+			for (int i = 0; i < 1; i++)
+			{
+				file << login << endl;
+			}
+			for (int i = 0; i < 1; i++)
+			{
+				file << password << endl;
+			}
+		}
+
+		void PassTest()
+		{
+			scors[scorsAmount] = Pass();
+			scorsAmount++;
+
+		}
+
+		void ShowResults()
+		{
+			for (int i = 0; i < 1; i++)
+			{
+				cout << scors[i];
+			}
+			cout << '%';
+		}
 };
 
-int main()
-{
-	setlocale(LC_ALL, "RU");
+		int main()
+		{
+			setlocale(LC_ALL, "RU");
+			User user;
+			cout << "Введите 1, если вы хотите создать пользователя; Введите 2, если вы хоите войти;";
+			cout << endl;
+			int x;
+			cin >> x;
+				/*if (x != 1 or x != 2)
+				{
+					cout << "Введите цифру еще раз";
 
-	User user;
-	user.AddUser();
-	user.PassTest();
-	//user.ShowResults();
-}
+				}*/
+			 
+			switch (x)
+			{
+			case 1:
+				user.registration();
+				;
+
+			case 2:
+				user.Enter();
+				;
+				user.SaveUser();
+			}
+
+			user.PassTest();
+			user.ShowResults();
+		}
 
 
